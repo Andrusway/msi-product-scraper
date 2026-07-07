@@ -1,4 +1,6 @@
 const { chromium } = require("playwright");
+const fs = require("fs");
+const path = require("path");
 
 const URL =
   "https://us-store.msi.com/Motherboards/Intel-Platform-Motherboard/INTEL-Z890/MAG-Z890-TOMAHAWK-WIFI";
@@ -18,12 +20,12 @@ async function scrape() {
   console.log("Title:", title.trim());
 
   const salePriceRaw = await page.locator("#prices-new").textContent();
-  const price = parseFloat(salePriceRaw.replace("$", ""));
-  console.log("Price:", price);
+  const salePrice = parseFloat(salePriceRaw.replace("$", ""));
+  console.log("Price:", salePrice);
 
   const priceRaw = await page.locator("#prices-old").textContent();
-  const salePrice = parseFloat(priceRaw.replace("$", ""));
-  console.log("Sale price:", salePrice);
+  const price = parseFloat(priceRaw.replace("$", ""));
+  console.log("Sale price:", price);
 
   const availabilityRaw = await page
     .locator("#prices-wrapper span:last-child")
@@ -64,7 +66,7 @@ async function scrape() {
   const thumbs = await page.locator("img.product-detail-thumb-bto").all();
   const additionalImageUrls = [];
   for (const thumb of thumbs) {
-    popupImg = await thumb.getAttribute("popup_img");
+    const popupImg = await thumb.getAttribute("popup_img");
 
     if (popupImg && !additionalImageUrls.includes(popupImg)) {
       additionalImageUrls.push(popupImg);
@@ -127,8 +129,6 @@ async function scrape() {
     scraped_at: scrapedAt,
   };
 
-  const fs = require("fs");
-  const path = require("path");
   const outputDir = path.join(__dirname, "..", "output");
   if (!fs.existsSync(outputDir)) {
     fs.mkdirSync(outputDir);
