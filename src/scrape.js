@@ -106,6 +106,41 @@ async function scrape() {
   else if (availabilityText.includes("pre-order")) availability = "pre_order";
   console.log("Availability normalized:", availability);
 
+  const product = {
+    url,
+    item_id: itemId,
+    title: title.trim(),
+    brand,
+    product_category: productCategory,
+    category_tree: categoryTree,
+    description: null,
+    price,
+    sale_price: salePrice,
+    availability,
+    image_url: imageUrl,
+    additional_image_urls: filteredImages,
+    specs,
+    star_rating: null,
+    review_count: null,
+    gtin: null,
+    mpn,
+    scraped_at: scrapedAt,
+  };
+
+  const fs = require("fs");
+  const path = require("path");
+  const outputDir = path.join(__dirname, "..", "output");
+  if (!fs.existsSync(outputDir)) {
+    fs.mkdirSync(outputDir);
+  }
+
+  fs.writeFileSync(
+    path.join(outputDir, "product.json"),
+    JSON.stringify(product, null, 2),
+  );
+
+  console.log("Saved to output/product.json ✅");
+
   await browser.close();
 }
 
